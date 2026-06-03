@@ -371,7 +371,7 @@ const LAYOUTS = {
 let tw = { theme:"Coral", font:"jakarta", accent:"#ff5a36", sh:100, sb:100, radius:14 };
 
 /* ===== INIT UI ===== */
-function refreshConn(){const on=!!apiKey;connDot.className='dot'+(on?' on':'');connTxt.textContent=on?'IA conectada':'Modo demo';}
+function refreshConn(){connDot.className='dot on';connTxt.textContent=apiKey?'IA conectada':'IA del equipo';}
 const connDot=document.getElementById('connDot'), connTxt=document.getElementById('connTxt');
 refreshConn();
 // chips
@@ -701,11 +701,6 @@ function quickDemo(brief){
 }
 function aiStart(){const b=document.getElementById('brief').value.trim();if(!b||busy)return;document.getElementById('brief').value='';addMsg(esc(b),'u');history.push({role:'user',content:b});runAI()}
 async function runAI(){busy=true;goBtn.disabled=true;
-  if(!apiKey){const t=addTyping('Armando una vista rápida…');await wait(650);t.remove();
-    const brief=(history.length&&history[history.length-1].content)||'';
-    quickDemo(brief);
-    addMsg('Te armé una <b>vista rápida</b> con el diseño premium del rubro 👆. Es una base — para que <b>investigue tu negocio de verdad</b> (logo, fotos y datos reales) y trabaje como un diseñador que te hace preguntas, conectá la IA en <b>"Conectar IA"</b>. También podés editar todo a mano en <b>Manual</b> o con los <b>Tweaks</b>.','b');
-    busy=false;goBtn.disabled=false;return;}
   const t=addTyping(research?'🔎 Investigando el negocio…':'Pensando…');
   try{
     const raw=await callClaude();t.remove();
@@ -717,26 +712,41 @@ async function runAI(){busy=true;goBtn.disabled=true;
     if(chatText){addMsg(mdLite(chatText),'b');}
     if(ask){renderAsk(ask);}
     else if(site&&!chatText){addMsg('Listo ✨ Ahí tenés la web. Ajustала con los <b>Tweaks</b> o pedime cambios.','b');}
-  }catch(e){t.remove();addMsg('Error de IA: '+esc(e.message)+'. Revisá tu API key o tu saldo en el Console.','sys')}
+  }catch(e){t.remove();
+    if(e.code==='team_nocredits'||e.code==='team_down'){
+      addMsg(e.code==='team_nocredits'
+        ?'Lo siento 🙏 — el equipo de Vendly se quedó sin créditos de IA por ahora. Podés <b>conectar tu propia IA</b> (botón "Conectar IA") o esperar a que el equipo recargue. Mientras tanto te dejo una <b>vista rápida</b> del diseño:'
+        :'La IA del equipo no está disponible en este momento. Podés <b>conectar tu propia IA</b> o probar de nuevo en un rato. Te dejo una <b>vista rápida</b> mientras:','sys');
+      const brief=(history.length&&history[history.length-1].content)||''; quickDemo(brief);
+    } else { addMsg('Uy, falló la IA: '+esc(e.message),'sys'); }
+  }
   busy=false;goBtn.disabled=false;
 }
+const TEAM_URL="/api/generate";
 async function callClaude(){
   const body={model,max_tokens:8000,system:SYS,messages:history};
-  const headers={"content-type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
   if(research){
     body.tools=[
       {type:"web_search_20250305",name:"web_search",max_uses:8,user_location:{type:"approximate",country:"AR",timezone:"America/Argentina/Buenos_Aires"}},
       {type:"web_fetch_20250910",name:"web_fetch",max_uses:6,max_content_tokens:8000}
     ];
-    headers["anthropic-beta"]="web-fetch-2025-09-10";
   }
-  const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers,
-    body:JSON.stringify(body)});
-  if(!r.ok){let m='';try{const j=await r.json();if(j.error&&j.error.message)m=j.error.message}catch(e){}
+  const viaTeam=!apiKey; let url,headers;
+  if(viaTeam){ url=TEAM_URL; headers={"content-type":"application/json"}; }
+  else{
+    url="https://api.anthropic.com/v1/messages";
+    headers={"content-type":"application/json","x-api-key":apiKey,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"};
+    if(research)headers["anthropic-beta"]="web-fetch-2025-09-10";
+  }
+  let r;
+  try{ r=await fetch(url,{method:"POST",headers,body:JSON.stringify(body)}); }
+  catch(netErr){ if(viaTeam){const e=new Error('team');e.code='team_down';throw e;} throw new Error('No hay conexión a internet. Probá de nuevo.'); }
+  if(!r.ok){let m='';try{const j=await r.json();if(j&&j.error&&j.error.message)m=j.error.message}catch(e){}
+    if(viaTeam){const e=new Error(m||('Error '+r.status));e.code=(r.status===402||/credit|balance|fund|quota/i.test(m))?'team_nocredits':'team_down';throw e;}
     if(r.status===401)throw new Error('Tu API key no es válida o expiró. Revisala tocando "Conectar IA".');
     if(r.status===429)throw new Error('Llegaste al límite de uso por ahora. Esperá unos segundos y probá de nuevo.');
     if(r.status===400&&/credit|balance|fund/i.test(m))throw new Error('Tu cuenta de Anthropic se quedó sin créditos. Cargá saldo en console.anthropic.com.');
-    if(r.status>=500)throw new Error('La API de Anthropic está sobrecargada. Probá de nuevo en un momento.');
+    if(r.status>=500)throw new Error('La IA está sobrecargada. Probá de nuevo en un momento.');
     throw new Error(m||('Error '+r.status))}
   const d=await r.json();
   return (d.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('\n').trim();
