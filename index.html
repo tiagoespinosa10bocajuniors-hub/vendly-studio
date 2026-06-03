@@ -92,6 +92,11 @@
   .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
   .chip{font-size:12px;font-weight:500;color:var(--app-mut);border:1px solid var(--app-line);padding:6px 12px;border-radius:20px;transition:.18s}
   .chip:hover{border-color:var(--app-accent);color:var(--app-accent);background:color-mix(in srgb,var(--app-accent) 16%,transparent)}
+  .assetrow{display:flex;align-items:center;gap:7px;margin-top:9px;flex-wrap:wrap}
+  .assetbtn{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--app-mut);border:1px dashed var(--app-line);background:var(--app-soft);padding:6px 11px;border-radius:9px;cursor:pointer;transition:.15s}
+  .assetbtn:hover{border-color:var(--app-accent);color:var(--app-accent)}
+  .assetbtn svg{stroke:currentColor;fill:none}
+  .assethint{font-size:11px;color:var(--ok);font-weight:600}
 
   /* manual form */
   .fld{margin-bottom:14px}
@@ -215,6 +220,11 @@
     <div class="composer" id="iaComposer">
       <textarea id="brief" rows="2" aria-label="Describí tu negocio" placeholder="Ej: Peluquería moderna en Quilmes llamada Studio Lux, cortes y color, estilo elegante..."></textarea>
       <label style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--app-mut);margin-top:8px;cursor:pointer"><input type="checkbox" id="researchTg" onchange="toggleResearch(this.checked)" style="accent-color:var(--app-accent)"> 🔎 Investigar el negocio en la web (datos reales)</label>
+      <div class="assetrow">
+        <label class="assetbtn" title="Subí el logo real del negocio"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> Subir logo<input type="file" accept="image/*" hidden onchange="uploadLogo(this)"></label>
+        <label class="assetbtn" title="Subí fotos reales del local/trabajos"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg> Subir fotos<input type="file" accept="image/*" multiple hidden onchange="uploadPhotos(this)"></label>
+        <span class="assethint" id="assetHint"></span>
+      </div>
       <div class="row"><span class="hint">Enter envía · Shift+Enter salto</span>
         <button class="sendb" id="goBtn" onclick="aiStart()">Crear <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </div>
@@ -226,6 +236,10 @@
         <h4><span class="n">1</span> Negocio</h4>
         <div class="fld"><label>Nombre</label><input id="f_name" value="Studio Lux"></div>
         <div class="fld"><label>Eslogan</label><input id="f_tag" value="Belleza que se nota"></div>
+        <div class="fld"><label>Logo</label>
+          <label class="upload"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> Subir logo<input type="file" accept="image/*" hidden onchange="uploadLogo(this)"></label>
+          <input id="f_logo" placeholder="o pegá la URL del logo" oninput="liveRender()" style="margin-top:7px">
+        </div>
       </div>
       <div class="grp">
         <h4><span class="n">2</span> Portada</h4>
@@ -233,7 +247,7 @@
         <div class="fld"><label>Subtítulo</label><textarea id="f_hsub">Cortes, color y tratamientos en un espacio pensado para vos.</textarea></div>
         <div class="fld"><label>Imagen de portada</label>
           <label class="upload"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg> Subir imagen<input type="file" accept="image/*" hidden onchange="uploadHero(this)"></label>
-          <input id="f_himg" placeholder="o pegá una URL" value="https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1600&auto=format&fit=crop" oninput="liveRender()" style="margin-top:7px">
+          <input id="f_himg" placeholder="o pegá la URL de una foto REAL del negocio" oninput="liveRender()" style="margin-top:7px">
         </div>
       </div>
       <div class="grp">
@@ -607,19 +621,27 @@ function showSite(html){lastHTML=html;document.getElementById('pv').srcdoc=html;
 let galleryData=[];
 function readManual(){
   return {
-    name:val('f_name'), tag:val('f_tag'), heroTitle:val('f_htitle'), heroSub:val('f_hsub'),
+    name:val('f_name'), tag:val('f_tag'), logo:val('f_logo')||userAssets.logo, heroTitle:val('f_htitle'), heroSub:val('f_hsub'),
     heroImg:val('f_himg'),
     services:[...document.querySelectorAll('#svcBox .svc-row')].map(r=>({t:r.querySelector('.s-t').value,d:r.querySelector('.s-d').value})),
     gallery:galleryData.slice(), wa:val('f_wa'), email:val('f_email'), addr:val('f_addr')
   };
 }
 function val(id){const e=document.getElementById(id);return e?e.value:''}
-function manualGenerate(){spec=readManual();showSite(renderSite(spec));}
-let liveT;function liveRender(){clearTimeout(liveT);liveT=setTimeout(()=>{if(mode==='man'){spec=readManual();showSite(renderSite(spec))}},350)}
+function manualGenerate(){spec=applyUserAssets(readManual());showSite(renderSite(spec));}
+let liveT;function liveRender(){clearTimeout(liveT);liveT=setTimeout(()=>{if(mode==='man'){spec=applyUserAssets(readManual());showSite(renderSite(spec))}},350)}
 document.getElementById('manPane').addEventListener('input',liveRender);
 function uploadHero(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{document.getElementById('f_himg').value=e.target.result;manualGenerate()};r.readAsDataURL(f)}
 function uploadGallery(inp){[...inp.files].forEach(f=>{const r=new FileReader();r.onload=e=>{galleryData.push(e.target.result);drawThumbs();manualGenerate()};r.readAsDataURL(f)})}
 function drawThumbs(){galThumbs.innerHTML=galleryData.map(u=>`<img src="${u}">`).join('')}
+let userAssets={logo:'',photos:[]};
+function applyUserAssets(sp){if(!sp)return sp;
+  if(userAssets.logo&&!sp.logo)sp.logo=userAssets.logo;
+  if(userAssets.photos.length){if(!sp.heroImg)sp.heroImg=userAssets.photos[0];sp.gallery=userAssets.photos.concat((sp.gallery||[]).filter(u=>userAssets.photos.indexOf(u)<0));}
+  return sp;}
+function setAssetHint(t){var el=document.getElementById('assetHint');if(el){el.textContent=t;if(t)setTimeout(()=>{if(el.textContent===t)el.textContent='';},4000);}}
+function uploadLogo(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{userAssets.logo=e.target.result;var fl=document.getElementById('f_logo');if(fl)fl.value=e.target.result;if(spec){spec.logo=userAssets.logo;showSite(renderSite(spec));saveProject();}setAssetHint('✓ Logo cargado');};r.readAsDataURL(f);inp.value='';}
+function uploadPhotos(inp){[...inp.files].forEach(f=>{const r=new FileReader();r.onload=e=>{userAssets.photos.push(e.target.result);galleryData.push(e.target.result);try{drawThumbs()}catch(x){}if(spec){applyUserAssets(spec);showSite(renderSite(spec));saveProject();}setAssetHint('✓ '+userAssets.photos.length+' foto(s) cargada(s)');};r.readAsDataURL(f);});inp.value='';}
 const galThumbs=document.getElementById('galThumbs');
 
 /* ===== IA ===== */
@@ -651,7 +673,7 @@ REGLA DE ORO de la ficha: NO inventes para llenarla. Si un dato no está, va ✗
 === PASO 2 · PREGUNTÁ (tarjeta de opciones clickeables) ===
 NO escribas las preguntas como texto suelto. Emití este bloque EXACTO en UNA línea, y NADA de sitio todavía:
 <<<VENDLY_ASK>>>{"intro":"Ya investigué. Esto es lo que me falta para que NO quede genérica 👇","questions":[{"q":"...","options":["...","..."],"multi":false}]}<<<END>>>
-Las preguntas salen de los ✗ de la ficha + gusto. Preguntá por lo que NO pudiste averiguar: servicios/precios reales, años reales de trayectoria, qué los hace distintos, y SIEMPRE por el logo + fotos reales ("Sí, las subo ahora" / "Todavía no las tengo"). NO preguntes algo que ya encontraste en la ficha. 3-5 preguntas, opciones concretas para ESE negocio. No construís hasta tener respuestas (salvo que digan "armala igual"/"dale"). HACÉS UNA SOLA RONDA DE PREGUNTAS: en tu PRÓXIMO turno, después de que el usuario responda o saltee, SIEMPRE emitís el sitio (PASO 3) — JAMÁS preguntás dos veces seguidas ni quedás en loop.
+Las preguntas salen de los ✗ de la ficha + gusto. Preguntá por lo que NO pudiste averiguar: servicios/precios reales, años reales de trayectoria, qué los hace distintos, y SIEMPRE por el logo + fotos reales. IMPORTANTE: el usuario puede subir el logo y las fotos reales con los botones "📎 Subir logo" y "🖼️ Subir fotos" que están JUSTO ABAJO del chat — decíselo siempre que pidas logo/fotos ("subilas con el botón 'Subir logo' acá abajo y las aplico al toque"). Las imágenes que suba se usan automáticamente en la web. NO preguntes algo que ya encontraste en la ficha. 3-5 preguntas, opciones concretas para ESE negocio. No construís hasta tener respuestas (salvo que digan "armala igual"/"dale"). HACÉS UNA SOLA RONDA DE PREGUNTAS: en tu PRÓXIMO turno, después de que el usuario responda o saltee, SIEMPRE emitís el sitio (PASO 3) — JAMÁS preguntás dos veces seguidas ni quedás en loop.
 
 === PASO 3 · CONSTRUÍ (solo con datos reales) ===
 Primero ELEGÍ EL ARQUETIPO DE DISEÑO según el rubro (cada uno tiene paleta, tipografía y layout propios — esto es lo que hace que NO sea genérico):
@@ -698,7 +720,7 @@ function quickDemo(brief){
     pro:{tag:'Profesional y confiable',h:'Soluciones claras para vos y tu negocio',sub:'Escribinos y coordinamos.',about:'Atención cercana y resultados concretos, con la confianza que buscás.',svc:['Servicio 1','Servicio 2','Servicio 3']}
   }[ar];
   var sp={layout:ar,name:nm,logo:'',tag:P.tag,heroTitle:P.h,heroSub:P.sub,heroImg:'',about:P.about,services:P.svc.map(t=>({t:t,d:''})),products:[],stats:[],gallery:[],email:'',addr:'',wa:VENDLY.wa};
-  applyLayout(ar);spec=sp;showSite(renderSite(sp));saveProject();
+  applyLayout(ar);applyUserAssets(sp);spec=sp;showSite(renderSite(sp));saveProject();
 }
 function aiStart(){const b=document.getElementById('brief').value.trim();if(!b||busy)return;document.getElementById('brief').value='';addMsg(esc(b),'u');history.push({role:'user',content:b});runAI()}
 async function runAI(){busy=true;goBtn.disabled=true;
@@ -709,7 +731,7 @@ async function runAI(){busy=true;goBtn.disabled=true;
     const ask=extractAsk(raw);
     const site=extractSite(raw);
     const chatText=raw.replace(/<<<VENDLY_(?:SITE|ASK)>>>[\s\S]*?<<<END>>>/g,'').trim();
-    if(site){if(site.layout)applyLayout(site.layout);site.wa=val('f_wa')||VENDLY.wa;spec=site;showSite(renderSite(spec));saveProject();}
+    if(site){if(site.layout)applyLayout(site.layout);site.wa=val('f_wa')||VENDLY.wa;applyUserAssets(site);spec=site;showSite(renderSite(spec));saveProject();}
     if(chatText){addMsg(mdLite(chatText),'b');}
     if(ask){renderAsk(ask);}
     else if(site&&!chatText){addMsg('Listo ✨ Ahí tenés la web. Ajustала con los <b>Tweaks</b> o pedime cambios.','b');}
@@ -803,8 +825,8 @@ brief.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventD
 brief.addEventListener('input',()=>{brief.style.height='auto';brief.style.height=Math.min(brief.scrollHeight,120)+'px'});
 
 /* ===== SAVE / RESTORE ===== */
-function saveProject(){try{localStorage.setItem('vs_proj',JSON.stringify({pname:document.getElementById('pname').value,spec,tw}))}catch(e){}}
-function restoreProject(){try{const r=JSON.parse(localStorage.getItem('vs_proj')||'null');if(r&&r.spec){if(r.pname)document.getElementById('pname').value=r.pname;if(r.tw)Object.assign(tw,r.tw);spec=r.spec;return true}}catch(e){}return false}
+function saveProject(){try{localStorage.setItem('vs_proj',JSON.stringify({pname:document.getElementById('pname').value,spec,tw,assets:{logo:userAssets.logo}}))}catch(e){}}
+function restoreProject(){try{const r=JSON.parse(localStorage.getItem('vs_proj')||'null');if(r&&r.spec){if(r.pname)document.getElementById('pname').value=r.pname;if(r.tw)Object.assign(tw,r.tw);if(r.assets&&r.assets.logo)userAssets.logo=r.assets.logo;spec=r.spec;return true}}catch(e){}return false}
 function syncTweaksUI(){
   document.querySelectorAll('.theme').forEach(b=>b.classList.toggle('on',b.dataset.nm===tw.theme));
   document.querySelectorAll('.fontb').forEach(b=>b.classList.toggle('on',b.dataset.k===tw.font));
