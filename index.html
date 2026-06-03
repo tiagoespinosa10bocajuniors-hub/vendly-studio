@@ -197,6 +197,7 @@
     <button class="tbtn" onclick="openSettings()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Conectar IA</button>
     <button class="tbtn on" id="twBtn" onclick="toggleTweaks()"><svg viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>Tweaks</button>
     <button class="tbtn" onclick="downloadSite()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Exportar</button>
+    <button class="tbtn" onclick="shareDemo()"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Compartir</button>
     <button class="tbtn prim" onclick="publish()"><svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Publicar</button>
   </div>
 </div>
@@ -454,6 +455,61 @@ function applyLayout(l){
   const cfg=LAYOUTS[l]; if(!cfg)return;
   try{ applyTheme(cfg.theme); applyFont(cfg.font); }catch(e){ tw.theme=cfg.theme; tw.font=cfg.font; }
 }
+/* ===== COMPARTIR DEMO — link gratis, sin servidor (LZString) ===== */
+var LZString=(function(){var f=String.fromCharCode;var keyStrUriSafe="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";var baseReverseDic={};function getBaseValue(alphabet,character){if(!baseReverseDic[alphabet]){baseReverseDic[alphabet]={};for(var i=0;i<alphabet.length;i++){baseReverseDic[alphabet][alphabet.charAt(i)]=i;}}return baseReverseDic[alphabet][character];}
+var LZ={compressToEncodedURIComponent:function(input){if(input==null)return"";return LZ._compress(input,6,function(a){return keyStrUriSafe.charAt(a);});},
+decompressFromEncodedURIComponent:function(input){if(input==null)return"";if(input=="")return null;input=input.replace(/ /g,"+");return LZ._decompress(input.length,32,function(index){return getBaseValue(keyStrUriSafe,input.charAt(index));});},
+_compress:function(uncompressed,bitsPerChar,getCharFromInt){if(uncompressed==null)return"";var i,value,context_dictionary={},context_dictionaryToCreate={},context_c="",context_wc="",context_w="",context_enlargeIn=2,context_dictSize=3,context_numBits=2,context_data=[],context_data_val=0,context_data_position=0,ii;for(ii=0;ii<uncompressed.length;ii+=1){context_c=uncompressed.charAt(ii);if(!Object.prototype.hasOwnProperty.call(context_dictionary,context_c)){context_dictionary[context_c]=context_dictSize++;context_dictionaryToCreate[context_c]=true;}context_wc=context_w+context_c;if(Object.prototype.hasOwnProperty.call(context_dictionary,context_wc)){context_w=context_wc;}else{if(Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)){if(context_w.charCodeAt(0)<256){for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}}value=context_w.charCodeAt(0);for(i=0;i<8;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}value=value>>1;}}else{value=1;for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1)|value;if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}value=0;}value=context_w.charCodeAt(0);for(i=0;i<16;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}value=value>>1;}}context_enlargeIn--;if(context_enlargeIn==0){context_enlargeIn=Math.pow(2,context_numBits);context_numBits++;}delete context_dictionaryToCreate[context_w];}else{value=context_dictionary[context_w];for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}value=value>>1;}}context_enlargeIn--;if(context_enlargeIn==0){context_enlargeIn=Math.pow(2,context_numBits);context_numBits++;}context_dictionary[context_wc]=context_dictSize++;context_w=String(context_c);}}if(context_w!==""){if(Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)){if(context_w.charCodeAt(0)<256){for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}}value=context_w.charCodeAt(0);for(i=0;i<8;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}value=value>>1;}}else{value=1;for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1)|value;if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}value=0;}value=context_w.charCodeAt(0);for(i=0;i<16;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}value=value>>1;}}context_enlargeIn--;if(context_enlargeIn==0){context_enlargeIn=Math.pow(2,context_numBits);context_numBits++;}delete context_dictionaryToCreate[context_w];}else{value=context_dictionary[context_w];for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}value=value>>1;}}context_enlargeIn--;if(context_enlargeIn==0){context_enlargeIn=Math.pow(2,context_numBits);context_numBits++;}}value=2;for(i=0;i<context_numBits;i++){context_data_val=(context_data_val<<1)|(value&1);if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}value=value>>1;}while(true){context_data_val=(context_data_val<<1);if(context_data_position==bitsPerChar-1){context_data.push(getCharFromInt(context_data_val));break;}else{context_data_position++;}}return context_data.join('');},
+_decompress:function(length,resetValue,getNextValue){var dictionary=[],next,enlargeIn=4,dictSize=4,numBits=3,entry="",result=[],i,w,bits,resb,maxpower,power,c,data={val:getNextValue(0),position:resetValue,index:1};for(i=0;i<3;i+=1){dictionary[i]=i;}bits=0;maxpower=Math.pow(2,2);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++);}bits|=(resb>0?1:0)*power;power<<=1;}switch(next=bits){case 0:bits=0;maxpower=Math.pow(2,8);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++);}bits|=(resb>0?1:0)*power;power<<=1;}c=f(bits);break;case 1:bits=0;maxpower=Math.pow(2,16);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++);}bits|=(resb>0?1:0)*power;power<<=1;}c=f(bits);break;case 2:return"";}dictionary[3]=c;w=c;result.push(c);while(true){if(data.index>length){return"";}bits=0;maxpower=Math.pow(2,numBits);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++);}bits|=(resb>0?1:0)*power;power<<=1;}switch(c=bits){case 0:bits=0;maxpower=Math.pow(2,8);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++);}bits|=(resb>0?1:0)*power;power<<=1;}dictionary[dictSize++]=f(bits);c=dictSize-1;enlargeIn--;break;case 1:bits=0;maxpower=Math.pow(2,16);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++);}bits|=(resb>0?1:0)*power;power<<=1;}dictionary[dictSize++]=f(bits);c=dictSize-1;enlargeIn--;break;case 2:return result.join('');}if(enlargeIn==0){enlargeIn=Math.pow(2,numBits);numBits++;}if(dictionary[c]){entry=dictionary[c];}else{if(c===dictSize){entry=w+w.charAt(0);}else{return null;}}result.push(entry);dictionary[dictSize++]=w+entry.charAt(0);enlargeIn--;w=entry;if(enlargeIn==0){enlargeIn=Math.pow(2,numBits);numBits++;}}}};return LZ;})();
+
+function _vtoast(msg,ok){var t=document.createElement('div');t.textContent=msg;t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99999;background:#171719;color:#f1f0ee;border:1px solid '+(ok?'rgba(34,197,94,.55)':'rgba(255,255,255,.16)')+';padding:12px 16px;border-radius:12px;font:500 14px/1.4 Inter,system-ui,sans-serif;box-shadow:0 12px 34px rgba(0,0,0,.5);max-width:90vw;text-align:center';document.body.appendChild(t);setTimeout(function(){t.style.transition='opacity .4s';t.style.opacity='0';setTimeout(function(){t.remove();},400);},2800);}
+
+function shareDemo(){
+  if(!spec||!lastHTML){alert('Primero generá una web (Manual o IA).');return;}
+  try{
+    var pn=(document.getElementById('pname')&&document.getElementById('pname').value)||spec.name||'Mi web';
+    var code=LZString.compressToEncodedURIComponent(JSON.stringify({s:spec,t:tw,n:pn}));
+    var url=location.origin+location.pathname+'#demo='+code;
+    if(url.length>16000){_vtoast('La demo tiene fotos muy pesadas para un link. Usá "Exportar" o subí las fotos a un link.',false);return;}
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(function(){_vtoast('✓ Link copiado — mandáselo al dueño por WhatsApp',true);},function(){_shareFallback(url);});
+    }else{_shareFallback(url);}
+  }catch(e){_vtoast('No pude armar el link: '+(e&&e.message),false);}
+}
+function _shareFallback(url){
+  try{var ta=document.createElement('textarea');ta.value=url;ta.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();_vtoast('✓ Link copiado — mandáselo al dueño',true);}
+  catch(e){window.prompt('Copiá este link y mandáselo al dueño:',url);}
+}
+
+/* ===== VISOR DE DEMO — lo que ve el dueño ===== */
+function _maybeDemoViewer(){
+  var h=location.hash||'';
+  if(h.indexOf('#demo=')!==0)return false;
+  try{
+    var d=JSON.parse(LZString.decompressFromEncodedURIComponent(h.slice(6)));
+    if(!d||!d.s)return false;
+    if(d.t)Object.assign(tw,d.t);
+    spec=d.s;
+    var siteHTML=renderSite(spec);
+    var name=d.n||'Tu negocio';
+    document.title=name+' · Vendly';
+    var waMsg=encodeURIComponent('Hola! Vi la demo de mi web ('+name+') y la quiero 🙌');
+    var bar='<div id="vbar"><span class="vbL"><span class="vmk">✦</span> Hecha con <b>Vendly</b></span>'
+      +'<span class="vbR"><a class="vbtn ghost" href="'+location.pathname+'?run=1" target="_blank" rel="noopener">Armá la tuya</a>'
+      +'<a class="vbtn prim" href="https://wa.me/'+VENDLY.wa+'?text='+waMsg+'" target="_blank" rel="noopener">La quiero 💬</a></span></div>';
+    var css='<style>html,body{margin:0;height:100%;background:#0e0e11}#dvf{position:fixed;inset:0 0 64px 0;width:100%;height:calc(100% - 64px);border:0}'
+      +'#vbar{position:fixed;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;background:#0e0e11;border-top:1px solid rgba(255,255,255,.12);font-family:Inter,system-ui,sans-serif;z-index:5}'
+      +'.vbL{color:#f1f0ee;font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px}.vbL b{font-weight:800}.vmk{color:#ff5a36}.vbR{display:flex;gap:8px}'
+      +'.vbtn{display:inline-flex;align-items:center;text-decoration:none;font-weight:700;font-size:14px;padding:10px 14px;border-radius:999px;white-space:nowrap}'
+      +'.vbtn.prim{background:#ff5a36;color:#fff}.vbtn.ghost{background:transparent;color:#f1f0ee;border:1px solid rgba(255,255,255,.18)}'
+      +'@media(max-width:560px){.vbtn.ghost{display:none}}</style>';
+    document.body.innerHTML='<iframe id="dvf" title="'+name+'"></iframe>'+bar;
+    document.head.insertAdjacentHTML('beforeend',css);
+    document.getElementById('dvf').srcdoc=siteHTML;
+    return true;
+  }catch(e){return false;}
+}
+
 /* ===== SITE TEMPLATE (variable-driven so Tweaks work live) ===== */
 function renderSite(s){
   const t=THEMES[tw.theme], f=FONTS[tw.font];
@@ -839,10 +895,14 @@ function syncTweaksUI(){
   document.getElementById('tw_r').value=tw.radius;rVal.textContent=tw.radius+'px';
 }
 /* ===== INITIAL ===== */
-document.getElementById('researchTg').checked=research;
-if(restoreProject()){syncTweaksUI();showSite(renderSite(spec));}
-else{spec=readManual();showSite(renderSite(spec));}
-setInterval(saveProject,4000);
+if(_maybeDemoViewer()){
+  /* Modo visor: el dueño ve solo su web + barra Vendly. No carga el studio. */
+}else{
+  document.getElementById('researchTg').checked=research;
+  if(restoreProject()){syncTweaksUI();showSite(renderSite(spec));}
+  else{spec=readManual();showSite(renderSite(spec));}
+  setInterval(saveProject,4000);
+}
 </script>
 </body>
 </html>
