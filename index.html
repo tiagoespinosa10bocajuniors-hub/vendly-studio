@@ -724,7 +724,7 @@ async function runAI(){busy=true;goBtn.disabled=true;
 }
 const TEAM_URL="/api/generate";
 async function callClaude(){
-  const body={model,max_tokens:8000,system:SYS,messages:history};
+  const body={model,max_tokens:8000,system:SYS+(research?'':'\n\n[MODO SIN INVESTIGACIÓN WEB: ahora NO tenés herramientas de búsqueda. Saltá el research del PASO 1. Si te faltan datos preguntá con el bloque VENDLY_ASK (PASO 2), o si el usuario dijo "armala"/"dale" construí con lo que te dio. JAMÁS escribas llamadas a herramientas/funciones como texto — emití directamente el bloque VENDLY_SITE o VENDLY_ASK.]'),messages:history};
   if(research){
     body.tools=[
       {type:"web_search_20250305",name:"web_search",max_uses:8,user_location:{type:"approximate",country:"AR",timezone:"America/Argentina/Buenos_Aires"}},
