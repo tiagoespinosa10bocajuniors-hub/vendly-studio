@@ -163,10 +163,20 @@
   .bp{background:var(--app-accent);color:#fff}.bg2{background:#f1ede6;color:var(--app-ink)}
   .modal a{color:var(--app-accent);font-weight:600}
 
-  @media(max-width:1000px){
+  .tw-scrim{display:none}
+  @media(max-width:900px){
     .stage{grid-template-columns:1fr;grid-template-rows:auto 1fr}
     .stage.notweaks{grid-template-columns:1fr}
-    .rail{max-height:42vh}.tweaks{display:none}
+    .rail{max-height:46vh}
+    .pname{display:none}
+    .tweaks{position:fixed;top:58px;right:0;bottom:0;width:min(320px,86vw);z-index:55;transform:translateX(101%);transition:transform .26s cubic-bezier(.2,.8,.2,1);box-shadow:-16px 0 44px -22px rgba(0,0,0,.5);border-left:1px solid var(--app-line)}
+    .stage.tweaks-open .tweaks{transform:none}
+    .tw-scrim{display:block;position:fixed;inset:58px 0 0 0;background:rgba(25,21,16,.42);z-index:54;opacity:0;pointer-events:none;transition:opacity .26s}
+    .stage.tweaks-open .tw-scrim{opacity:1;pointer-events:auto}
+    .devb,.chip,.opt,.mode,.tbtn{min-height:42px;display:inline-flex;align-items:center;justify-content:center}
+  }
+  @media(max-width:560px){
+    .top{padding:0 12px}.tbtn{padding:8px 11px}.brand .rp{display:none}
   }
 </style>
 </head>
@@ -186,6 +196,7 @@
 </div>
 
 <div class="stage" id="stage">
+  <div class="tw-scrim" onclick="toggleTweaks()" aria-hidden="true"></div>
   <!-- LEFT RAIL -->
   <div class="rail">
     <div class="modes">
@@ -391,7 +402,10 @@ function setMode(m){mode=m;
   manPane.style.display=m==='man'?'block':'none';
   if(m==='man'&&!spec) manualGenerate();
 }
-function toggleTweaks(){stage.classList.toggle('notweaks');twBtn.classList.toggle('on',!stage.classList.contains('notweaks'));}
+function toggleTweaks(){
+  if(window.innerWidth<=900){stage.classList.toggle('tweaks-open');twBtn.classList.toggle('on',stage.classList.contains('tweaks-open'));}
+  else{stage.classList.toggle('notweaks');twBtn.classList.toggle('on',!stage.classList.contains('notweaks'));}
+}
 function setDevice(d){device=d;dDesk.classList.toggle('on',d==='desk');dMob.classList.toggle('on',d==='mob');dDesk.setAttribute('aria-pressed',d==='desk');dMob.setAttribute('aria-pressed',d==='mob');
   document.getElementById('frame').classList.toggle('mobile',d==='mob');}
 
@@ -636,7 +650,7 @@ REGLA DE ORO de la ficha: NO inventes para llenarla. Si un dato no está, va ✗
 === PASO 2 · PREGUNTÁ (tarjeta de opciones clickeables) ===
 NO escribas las preguntas como texto suelto. Emití este bloque EXACTO en UNA línea, y NADA de sitio todavía:
 <<<VENDLY_ASK>>>{"intro":"Ya investigué. Esto es lo que me falta para que NO quede genérica 👇","questions":[{"q":"...","options":["...","..."],"multi":false}]}<<<END>>>
-Las preguntas salen de los ✗ de la ficha + gusto. Preguntá por lo que NO pudiste averiguar: servicios/precios reales, años reales de trayectoria, qué los hace distintos, y SIEMPRE por el logo + fotos reales ("Sí, las subo ahora" / "Todavía no las tengo"). NO preguntes algo que ya encontraste en la ficha. 3-5 preguntas, opciones concretas para ESE negocio. No construís hasta tener respuestas (salvo que digan "armala igual"/"dale").
+Las preguntas salen de los ✗ de la ficha + gusto. Preguntá por lo que NO pudiste averiguar: servicios/precios reales, años reales de trayectoria, qué los hace distintos, y SIEMPRE por el logo + fotos reales ("Sí, las subo ahora" / "Todavía no las tengo"). NO preguntes algo que ya encontraste en la ficha. 3-5 preguntas, opciones concretas para ESE negocio. No construís hasta tener respuestas (salvo que digan "armala igual"/"dale"). HACÉS UNA SOLA RONDA DE PREGUNTAS: en tu PRÓXIMO turno, después de que el usuario responda o saltee, SIEMPRE emitís el sitio (PASO 3) — JAMÁS preguntás dos veces seguidas ni quedás en loop.
 
 === PASO 3 · CONSTRUÍ (solo con datos reales) ===
 Primero ELEGÍ EL ARQUETIPO DE DISEÑO según el rubro (cada uno tiene paleta, tipografía y layout propios — esto es lo que hace que NO sea genérico):
@@ -666,10 +680,31 @@ SÉ HONESTO SIEMPRE: si no sabés algo, preguntalo; si algo queda flojo, decilo.
 const thread=document.getElementById('thread');
 function addMsg(t,w){const d=document.createElement('div');d.className='msg '+w;d.innerHTML=t;thread.appendChild(d);thread.scrollTop=thread.scrollHeight;return d}
 function addTyping(label){const d=document.createElement('div');d.className='typing';d.innerHTML=(label?'<span style="font-size:12px;color:var(--app-mut);margin-right:8px">'+label+'</span>':'')+'<i></i><i></i><i></i>';thread.appendChild(d);thread.scrollTop=thread.scrollHeight;return d}
+function detectLayout(s){s=(s||'').toLowerCase();
+  if(/(peluquer|estétic|estetic|belleza|spa|maquill|uñas|unas|nail|cabello|moda|makeup|barber)/.test(s))return /barber/.test(s)?'studio':'editorial';
+  if(/(restau|caf[eé]|bar|parrilla|pizz|comida|gastro|panad|helad|resto|cocina|men[uú])/.test(s))return'gourmet';
+  if(/(evento|fotograf|boda|casamiento|sal[oó]n|deco|fiesta|catering)/.test(s))return'atelier';
+  if(/(tatu|tattoo|gimnasio|gym|taller|mec[aá]nic|auto|herrer|carpinter|lavadero)/.test(s))return'studio';
+  return'pro';}
+function detectName(s){s=s||'';var m=s.match(/llamad[oa]\s+([A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑáéíóúñ&'’\.\- ]{1,28})/)||s.match(/["“']([^"”']{2,28})["”']/);return m?m[1].trim().replace(/\s+(en|de|que|con|para)\b.*$/i,'').replace(/[.,].*$/,'').trim():'';}
+function quickDemo(brief){
+  var ar=detectLayout(brief), nm=detectName(brief)||'Tu Negocio';
+  var P={
+    editorial:{tag:'Belleza y estilo',h:'Tu mejor versión, en cada detalle',sub:'Reservá tu turno y viví la experiencia.',about:'Un espacio pensado para vos: técnica, tendencia y dedicación en cada servicio.',svc:['Cortes y peinados','Color y mechas','Tratamientos','Estilismo']},
+    gourmet:{tag:'Cocina y sabor',h:'Sabores que se disfrutan sin apuro',sub:'Reservá tu mesa y dejate sorprender.',about:'Ingredientes cuidados y una cocina con identidad para cada visita.',svc:['Entradas','Principales','Postres','Vinos']},
+    atelier:{tag:'Momentos únicos',h:'Hacemos que tu evento se sienta inolvidable',sub:'Contanos tu idea y la hacemos realidad.',about:'Cada evento es único: lo planeamos al detalle para que solo disfrutes.',svc:['Organización','Ambientación','Fotografía','Catering']},
+    studio:{tag:'Oficio y actitud',h:'Trabajo prolijo, con onda y a tiempo',sub:'Pedí tu turno hoy.',about:'Años de oficio y atención personalizada en cada trabajo.',svc:['Servicio principal','Detalles','Asesoría','Turnos']},
+    pro:{tag:'Profesional y confiable',h:'Soluciones claras para vos y tu negocio',sub:'Escribinos y coordinamos.',about:'Atención cercana y resultados concretos, con la confianza que buscás.',svc:['Servicio 1','Servicio 2','Servicio 3']}
+  }[ar];
+  var sp={layout:ar,name:nm,logo:'',tag:P.tag,heroTitle:P.h,heroSub:P.sub,heroImg:'',about:P.about,services:P.svc.map(t=>({t:t,d:''})),products:[],stats:[],gallery:[],email:'',addr:'',wa:VENDLY.wa};
+  applyLayout(ar);spec=sp;showSite(renderSite(sp));saveProject();
+}
 function aiStart(){const b=document.getElementById('brief').value.trim();if(!b||busy)return;document.getElementById('brief').value='';addMsg(esc(b),'u');history.push({role:'user',content:b});runAI()}
 async function runAI(){busy=true;goBtn.disabled=true;
-  if(!apiKey){const t=addTyping();await wait(500);t.remove();
-    addMsg('Estoy en <b>modo demo</b>. Conectá tu API key (botón "Conectar IA") y genero la web sola acá. Mientras tanto, probá el <b>modo Manual</b> a la izquierda — funciona sin clave.','sys');
+  if(!apiKey){const t=addTyping('Armando una vista rápida…');await wait(650);t.remove();
+    const brief=(history.length&&history[history.length-1].content)||'';
+    quickDemo(brief);
+    addMsg('Te armé una <b>vista rápida</b> con el diseño premium del rubro 👆. Es una base — para que <b>investigue tu negocio de verdad</b> (logo, fotos y datos reales) y trabaje como un diseñador que te hace preguntas, conectá la IA en <b>"Conectar IA"</b>. También podés editar todo a mano en <b>Manual</b> o con los <b>Tweaks</b>.','b');
     busy=false;goBtn.disabled=false;return;}
   const t=addTyping(research?'🔎 Investigando el negocio…':'Pensando…');
   try{
