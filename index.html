@@ -530,7 +530,7 @@ function _maybeDemoViewer(){
       +'.vbtn.prim{background:#ff5a36;color:#fff}.vbtn.ghost{background:transparent;color:#f1f0ee;border:1px solid rgba(255,255,255,.18)}'
       +'@media(max-width:560px){.vbtn.ghost{display:none}}</style>';
     if(kind==='site'){
-      bar='<div id="vcred"><a href="'+location.pathname+'?run=1" target="_blank" rel="noopener">✦ Hecho con Vendly</a></div>';
+      bar='<div id="vcred"><a href="'+location.pathname+'?edit='+encodeURIComponent(h.slice(6))+'" target="_blank" rel="noopener">Editar</a> <span style="opacity:.35">·</span> <a href="'+location.pathname+'?run=1" target="_blank" rel="noopener">✦ Hecho con Vendly</a></div>';
       css='<style>html,body{margin:0;height:100%;background:#0e0e11}#dvf{position:fixed;inset:0 0 32px 0;width:100%;height:calc(100% - 32px);border:0}'
         +'#vcred{position:fixed;left:0;right:0;bottom:0;height:32px;display:flex;align-items:center;justify-content:center;background:#0e0e11;border-top:1px solid rgba(255,255,255,.10);font-family:Inter,system-ui,sans-serif;z-index:5}'
         +'#vcred a{color:#9b9aa1;font-size:12px;font-weight:600;text-decoration:none}</style>';
@@ -560,7 +560,7 @@ function renderSite(s){
   const prods=(s.products||[]).filter(x=>x&&x.t);
   const ctaH={editorial:'Reservá tu turno',gourmet:'Reservá tu mesa',atelier:'Hagamos algo inolvidable',studio:'Pedí tu turno',pro:'Hablemos'}[ar]||'Hablemos';
   const ctaBtn=L.svc==='menu'?'Reservar mesa':'Escribinos por WhatsApp';
-  return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(s.name||'Mi negocio')}</title><meta name="description" content="${esc((s.tagline||s.sub||s.name||'').toString().slice(0,160))}"><meta property="og:title" content="${esc(s.name||'')}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,900&family=Jost:wght@300;400;500&family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
 <style>
@@ -728,8 +728,8 @@ function applyUserAssets(sp){if(!sp)return sp;
   if(userAssets.photos.length){if(!sp.heroImg)sp.heroImg=userAssets.photos[0];sp.gallery=userAssets.photos.concat((sp.gallery||[]).filter(u=>userAssets.photos.indexOf(u)<0));}
   return sp;}
 function setAssetHint(t){var el=document.getElementById('assetHint');if(el){el.textContent=t;if(t)setTimeout(()=>{if(el.textContent===t)el.textContent='';},4000);}}
-function uploadLogo(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{userAssets.logo=e.target.result;var fl=document.getElementById('f_logo');if(fl)fl.value=e.target.result;if(spec){spec.logo=userAssets.logo;showSite(renderSite(spec));saveProject();}setAssetHint('✓ Logo cargado');};r.readAsDataURL(f);inp.value='';}
-function uploadPhotos(inp){[...inp.files].forEach(f=>{const r=new FileReader();r.onload=e=>{userAssets.photos.push(e.target.result);galleryData.push(e.target.result);try{drawThumbs()}catch(x){}if(spec){applyUserAssets(spec);showSite(renderSite(spec));saveProject();}setAssetHint('✓ '+userAssets.photos.length+' foto(s) cargada(s)');};r.readAsDataURL(f);});inp.value='';}
+function uploadLogo(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{_compressImg(e.target.result,400,0.85,function(d){userAssets.logo=d;var fl=document.getElementById('f_logo');if(fl)fl.value=d;if(spec){spec.logo=userAssets.logo;showSite(renderSite(spec));saveProject();}setAssetHint('✓ Logo cargado');});};r.readAsDataURL(f);inp.value='';}
+function uploadPhotos(inp){[...inp.files].forEach(f=>{const r=new FileReader();r.onload=e=>{_compressImg(e.target.result,1100,0.7,function(d){userAssets.photos.push(d);galleryData.push(d);try{drawThumbs()}catch(x){}if(spec){applyUserAssets(spec);showSite(renderSite(spec));saveProject();}setAssetHint('✓ '+userAssets.photos.length+' foto(s) cargada(s)');});};r.readAsDataURL(f);});inp.value='';}
 const galThumbs=document.getElementById('galThumbs');
 
 /* ===== IA ===== */
@@ -923,6 +923,8 @@ function _aiFetch(body){
   if(apiKey){return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});}
   return fetch('/api/generate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
 }
+function _fp(s){var h=0,i;for(i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0;}return 'f'+(h>>>0).toString(36)+'_'+s.length;}
+function _compressImg(dataURL,maxW,q,cb){try{var img=new Image();img.onload=function(){var w=img.width,hh=img.height;if(w>maxW){hh=Math.round(hh*maxW/w);w=maxW;}var c=document.createElement('canvas');c.width=w;c.height=hh;c.getContext('2d').drawImage(img,0,0,w,hh);try{cb(c.toDataURL('image/jpeg',q));}catch(e){cb(dataURL);}};img.onerror=function(){cb(dataURL);};img.src=dataURL;}catch(e){cb(dataURL);}}
 function payCopy(which){var v=which==='alias'?PAY.alias:PAY.cbu;try{navigator.clipboard.writeText(v);_vtoast('Copiado: '+v,true);}catch(e){window.prompt('Copiá:',v);}}
 function payStart(){
   var sel=document.querySelector('input[name="pubaddr"]:checked'); var addr=sel?sel.value:'vendly';
@@ -950,7 +952,12 @@ function payVerify(dataURL){
     var aliasN=PAY.alias.toLowerCase().replace(/[\s.]/g,'');
     var destOK = dest.indexOf('espinosa')>=0 || dest.indexOf(aliasN)>=0 || dest.indexOf(PAY.cbu.slice(-8))>=0;
     var montoOK = typeof v.monto==='number' && v.monto>=PAY.price*0.99;
-    if(v.parece_real && v.es_hoy && destOK && montoOK){ publishNow(); }
+    if(v.parece_real && v.es_hoy && destOK && montoOK){
+      var fp=_fp(dataURL); var used=[]; try{used=JSON.parse(localStorage.getItem('vpaid_used')||'[]');}catch(e){}
+      if(used.indexOf(fp)>=0){note.textContent='Ese comprobante ya se usó para publicar otra web. Cada transferencia sirve para una sola publicación.';note.style.color='var(--app-accent)';return;}
+      used.push(fp); try{localStorage.setItem('vpaid_used',JSON.stringify(used.slice(-200)));}catch(e){}
+      publishNow();
+    }
     else {
       var why = !montoOK?('el monto no coincide (esperado $'+PAY.price.toLocaleString('es-AR')+')') : (!destOK?'el destinatario no figura como vos' : (!v.es_hoy?'la fecha no es de hoy' : 'el comprobante no parece válido'));
       note.textContent='No lo pude aprobar: '+why+'. Revisá y subilo de nuevo.'; note.style.color='var(--app-accent)';
@@ -961,10 +968,18 @@ function publishNow(){
   var pn=(document.getElementById('pname')&&document.getElementById('pname').value)||spec.name||'Mi web';
   var code=LZString.compressToEncodedURIComponent(JSON.stringify({s:spec,t:tw,n:pn}));
   var note=document.getElementById('pubNote');
-  if((location.origin+location.pathname+'#site='+code).length>16000){note.textContent='Tu web tiene fotos muy pesadas para publicar por link. Publicá con menos fotos.';note.style.color='var(--app-accent)';return;}
+  if((location.origin+location.pathname+'#site='+code).length>120000){note.textContent='Tu web tiene demasiadas fotos pesadas para publicar por link. Sacá alguna foto y probá de nuevo.';note.style.color='var(--app-accent)';return;}
   var url=location.origin+location.pathname+'#site='+code;
+  var editURL=location.origin+location.pathname+'?edit='+encodeURIComponent(code);
+  var waSave='https://wa.me/?text='+encodeURIComponent('Mi web hecha con Vendly: '+url);
+  try{var done=JSON.parse(localStorage.getItem('vpub_done')||'[]');done.push({url:url,name:pn,at:Date.now()});localStorage.setItem('vpub_done',JSON.stringify(done.slice(-50)));}catch(e){}
   note.style.color='var(--ok)';
-  note.innerHTML='✓ ¡Pago verificado y web publicada! Tu link:<br><a href="'+url+'" target="_blank" rel="noopener" style="color:var(--app-accent);word-break:break-all">'+url+'</a> <button class="bg2" style="padding:3px 9px;font-size:12px" onclick="(function(b){try{navigator.clipboard.writeText(b.previousElementSibling.href)}catch(e){};b.textContent=\'copiado\'})(this)">copiar</button>';
+  note.innerHTML='✓ ¡Pago verificado y web publicada!<br><a href="'+url+'" target="_blank" rel="noopener" style="color:var(--app-accent);word-break:break-all">'+url+'</a>'
+    +'<span style="display:inline-flex;gap:6px;flex-wrap:wrap;margin-top:10px">'
+    +'<a class="bg2" style="padding:5px 11px;font-size:12px;text-decoration:none" href="'+url+'" target="_blank" rel="noopener">Abrir</a>'
+    +'<a class="bg2" style="padding:5px 11px;font-size:12px;text-decoration:none" href="'+waSave+'" target="_blank" rel="noopener">Guardar por WhatsApp</a>'
+    +'<a class="bg2" style="padding:5px 11px;font-size:12px;text-decoration:none" href="'+editURL+'" target="_blank" rel="noopener">Editar</a>'
+    +'</span>';
 }
 (function(){var ps=document.getElementById('pubScrim');if(ps){ps.addEventListener('click',function(e){if(e.target.id==='pubScrim')pubClose();});}document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ps&&ps.classList.contains('on'))pubClose();});})();
 
@@ -1024,8 +1039,11 @@ if(_maybePaidReturn()){
 }else if(_maybeDemoViewer()){
   /* Modo visor: el dueño ve solo su web (demo con barra, o publicada con crédito). */
 }else{
+  var _ep=null; try{_ep=new URLSearchParams(location.search).get('edit');}catch(e){}
+  if(_ep){try{var _ed=JSON.parse(LZString.decompressFromEncodedURIComponent(_ep));if(_ed&&_ed.s){if(_ed.t)Object.assign(tw,_ed.t);spec=_ed.s;if(_ed.n){var _pe=document.getElementById('pname');if(_pe)_pe.value=_ed.n;}}}catch(e){_ep=null;}}
   document.getElementById('researchTg').checked=research;
-  if(restoreProject()){syncTweaksUI();showSite(renderSite(spec));}
+  if(_ep&&spec){syncTweaksUI();showSite(renderSite(spec));}
+  else if(restoreProject()){syncTweaksUI();showSite(renderSite(spec));}
   else{spec=readManual();showSite(renderSite(spec));}
   setInterval(saveProject,4000);
 }
