@@ -915,7 +915,7 @@ function pubOpen(){
   if(!spec||!lastHTML){alert('Primero generá una web (Manual o IA).');return;}
   _pubScrim=_pubScrim||document.getElementById('pubScrim');
   var n=document.getElementById('pubNote'); if(n)n.textContent='';
-  var b=document.getElementById('pubGoBtn'); if(b){b.disabled=false;b.textContent='Pagar y publicar →';}
+  var b=document.getElementById('pubGoBtn'); if(b){b.disabled=false;b.textContent='Subí el comprobante →';}
   _pubScrim.classList.add('on');
 }
 function pubClose(){if(_pubScrim)_pubScrim.classList.remove('on');}
