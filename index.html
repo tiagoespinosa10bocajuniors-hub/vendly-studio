@@ -346,9 +346,34 @@
   </div>
 </div>
 
+<!-- PUBLISH MODAL -->
+<div class="scrim" id="pubScrim" role="dialog" aria-modal="true" aria-labelledby="pubTitle">
+  <div class="modal">
+    <h3 id="pubTitle">Publicar tu web</h3>
+    <p class="s">Pagás una vez y tu web queda online al instante, con un link propio para compartir.</p>
+    <div class="fld">
+      <label style="display:block;margin-bottom:8px">Elegí la dirección</label>
+      <label style="display:flex;gap:9px;align-items:flex-start;padding:10px 12px;border:1px solid var(--app-line);border-radius:10px;margin-bottom:8px;cursor:pointer"><input type="radio" name="pubaddr" value="vendly" checked style="margin-top:3px"><span><b>Dirección Vendly</b> — gratis, lista al toque<br><span class="s" style="margin:0">tunegocio.vendly.ar</span></span></label>
+      <label style="display:flex;gap:9px;align-items:flex-start;padding:10px 12px;border:1px solid var(--app-line);border-radius:10px;cursor:pointer"><input type="radio" name="pubaddr" value="propio" style="margin-top:3px"><span><b>Dominio propio</b> — tu .com.ar<br><span class="s" style="margin:0">lo coordinamos por WhatsApp</span></span></label>
+    </div>
+    <div class="fld" style="margin-top:2px">
+      <label>Transferí y subí el comprobante</label>
+      <div style="background:var(--app-soft);border:1px solid var(--app-line);border-radius:10px;padding:12px;font-size:14px;line-height:1.9">
+        Monto: <b id="payMonto">$20.000</b><br>
+        Alias: <b id="payAlias">tiago.espinosa</b> <button class="bg2" type="button" style="padding:2px 8px;font-size:12px" onclick="payCopy('alias')">copiar</button><br>
+        <span style="font-size:12px;color:var(--app-mut)">CBU: <span id="payCbu">0000003100007726082901</span></span> <button class="bg2" type="button" style="padding:2px 8px;font-size:12px" onclick="payCopy('cbu')">copiar</button>
+      </div>
+    </div>
+    <input type="file" id="payFile" accept="image/*" style="display:none" onchange="payUpload(this)">
+    <div class="mrow"><button class="bg2" onclick="pubClose()">Cancelar</button><button class="bp" id="pubGoBtn" onclick="payStart()">Subí el comprobante →</button></div>
+    <p class="s" id="pubNote" style="margin:8px 0 0;color:var(--app-accent)"></p>
+  </div>
+</div>
+
 <script>
 /* ===== CONFIG ===== */
 const VENDLY = { wa:"5491122513288" };
+const PAY = { alias:"tiago.espinosa", cbu:"0000003100007726082901", price:20000 };
 function lsG(k){try{return localStorage.getItem(k)||""}catch(e){return""}}
 function lsS(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 function lsD(k){try{localStorage.removeItem(k)}catch(e){}}
@@ -484,7 +509,8 @@ function _shareFallback(url){
 /* ===== VISOR DE DEMO — lo que ve el dueño ===== */
 function _maybeDemoViewer(){
   var h=location.hash||'';
-  if(h.indexOf('#demo=')!==0)return false;
+  var kind=h.indexOf('#demo=')===0?'demo':(h.indexOf('#site=')===0?'site':'');
+  if(!kind)return false;
   try{
     var d=JSON.parse(LZString.decompressFromEncodedURIComponent(h.slice(6)));
     if(!d||!d.s)return false;
@@ -492,7 +518,7 @@ function _maybeDemoViewer(){
     spec=d.s;
     var siteHTML=renderSite(spec);
     var name=d.n||'Tu negocio';
-    document.title=name+' · Vendly';
+    document.title=name+(kind==='demo'?' · Vendly':'');
     var waMsg=encodeURIComponent('Hola! Vi la demo de mi web ('+name+') y la quiero 🙌');
     var bar='<div id="vbar"><span class="vbL"><span class="vmk">✦</span> Hecha con <b>Vendly</b></span>'
       +'<span class="vbR"><a class="vbtn ghost" href="'+location.pathname+'?run=1" target="_blank" rel="noopener">Armá la tuya</a>'
@@ -503,6 +529,12 @@ function _maybeDemoViewer(){
       +'.vbtn{display:inline-flex;align-items:center;text-decoration:none;font-weight:700;font-size:14px;padding:10px 14px;border-radius:999px;white-space:nowrap}'
       +'.vbtn.prim{background:#ff5a36;color:#fff}.vbtn.ghost{background:transparent;color:#f1f0ee;border:1px solid rgba(255,255,255,.18)}'
       +'@media(max-width:560px){.vbtn.ghost{display:none}}</style>';
+    if(kind==='site'){
+      bar='<div id="vcred"><a href="'+location.pathname+'?run=1" target="_blank" rel="noopener">✦ Hecho con Vendly</a></div>';
+      css='<style>html,body{margin:0;height:100%;background:#0e0e11}#dvf{position:fixed;inset:0 0 32px 0;width:100%;height:calc(100% - 32px);border:0}'
+        +'#vcred{position:fixed;left:0;right:0;bottom:0;height:32px;display:flex;align-items:center;justify-content:center;background:#0e0e11;border-top:1px solid rgba(255,255,255,.10);font-family:Inter,system-ui,sans-serif;z-index:5}'
+        +'#vcred a{color:#9b9aa1;font-size:12px;font-weight:600;text-decoration:none}</style>';
+    }
     document.body.innerHTML='<iframe id="dvf" title="'+name+'"></iframe>'+bar;
     document.head.insertAdjacentHTML('beforeend',css);
     document.getElementById('dvf').srcdoc=siteHTML;
@@ -875,7 +907,99 @@ function renderAsk(data){
 /* ===== ACTIONS ===== */
 function downloadSite(){if(!lastHTML){alert('Primero generá una web (Manual o IA).');return}
   const blob=new Blob([lastHTML],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(a._b=blob);a.download='index.html';a.click();URL.revokeObjectURL(a.href)}
-function publish(){const msg=encodeURIComponent("Hola Vendly! Terminé una web en el Studio y la quiero publicar.");window.open("https://wa.me/"+VENDLY.wa+"?text="+msg,"_blank")}
+/* ===== PUBLICAR (pago MercadoPago + publicación automática) ===== */
+function publish(){ pubOpen(); }
+function publishWA(){var msg=encodeURIComponent("Hola Vendly! Terminé una web en el Studio y la quiero publicar.");window.open("https://wa.me/"+VENDLY.wa+"?text="+msg,"_blank");}
+var _pubScrim;
+function pubOpen(){
+  if(!spec||!lastHTML){alert('Primero generá una web (Manual o IA).');return;}
+  _pubScrim=_pubScrim||document.getElementById('pubScrim');
+  var n=document.getElementById('pubNote'); if(n)n.textContent='';
+  var b=document.getElementById('pubGoBtn'); if(b){b.disabled=false;b.textContent='Pagar y publicar →';}
+  _pubScrim.classList.add('on');
+}
+function pubClose(){if(_pubScrim)_pubScrim.classList.remove('on');}
+function _aiFetch(body){
+  if(apiKey){return fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify(body)});}
+  return fetch('/api/generate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+}
+function payCopy(which){var v=which==='alias'?PAY.alias:PAY.cbu;try{navigator.clipboard.writeText(v);_vtoast('Copiado: '+v,true);}catch(e){window.prompt('Copiá:',v);}}
+function payStart(){
+  var sel=document.querySelector('input[name="pubaddr"]:checked'); var addr=sel?sel.value:'vendly';
+  if(addr==='propio'){var m=encodeURIComponent('Hola Vendly! Quiero publicar mi web con dominio propio.');window.open('https://wa.me/'+VENDLY.wa+'?text='+m,'_blank');return;}
+  document.getElementById('payFile').click();
+}
+function payUpload(inp){
+  var f=inp.files&&inp.files[0]; if(!f){return;}
+  var note=document.getElementById('pubNote'); note.style.color='var(--app-mut)'; note.textContent='Leyendo el comprobante…';
+  var r=new FileReader(); r.onload=function(){payVerify(r.result);}; r.onerror=function(){note.textContent='No pude abrir esa imagen.';note.style.color='var(--app-accent)';}; r.readAsDataURL(f); inp.value='';
+}
+function payVerify(dataURL){
+  var note=document.getElementById('pubNote');
+  var m=/^data:(image\/[a-z0-9.+-]+);base64,(.*)$/i.exec(dataURL||'');
+  if(!m){note.textContent='Esa imagen no se pudo leer. Subí una captura clara del comprobante.';note.style.color='var(--app-accent)';return;}
+  var today=new Date().toLocaleDateString('es-AR');
+  var prompt='Sos un verificador de comprobantes de transferencia bancaria de Argentina. Mira la imagen y responde SOLO un JSON valido, sin texto extra ni markdown: {"monto":number|null,"destino":"texto del destinatario, alias, cbu o titular que recibe","es_hoy":true|false,"parece_real":true|false,"motivo":"breve"}. Hoy es '+today+'. El monto en pesos como numero, sin signos ni puntos.';
+  var body={model:'claude-haiku-4-5-20251001',max_tokens:600,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:m[1],data:m[2]}},{type:'text',text:prompt}]}]};
+  note.textContent='Verificando el pago con IA…';
+  _aiFetch(body).then(function(r){return r.json();}).then(function(d){
+    if(d&&d.error){var c=d.error.code; if(c==='team_nocredits'||c==='no_credits'){note.textContent='Sin créditos de IA para verificar ahora. Probá más tarde o conectá tu IA.';}else{note.textContent='No pude verificar: '+(d.error.message||'error');} note.style.color='var(--app-accent)';return;}
+    var txt=(d&&d.content&&d.content[0]&&d.content[0].text)||''; var jm=txt.match(/\{[\s\S]*\}/); var v=null; try{v=JSON.parse(jm?jm[0]:txt);}catch(e){}
+    if(!v){note.textContent='No pude leer el comprobante. Subí una captura más nítida.';note.style.color='var(--app-accent)';return;}
+    var dest=(v.destino||'').toString().toLowerCase().replace(/[\s.]/g,'');
+    var aliasN=PAY.alias.toLowerCase().replace(/[\s.]/g,'');
+    var destOK = dest.indexOf('espinosa')>=0 || dest.indexOf(aliasN)>=0 || dest.indexOf(PAY.cbu.slice(-8))>=0;
+    var montoOK = typeof v.monto==='number' && v.monto>=PAY.price*0.99;
+    if(v.parece_real && v.es_hoy && destOK && montoOK){ publishNow(); }
+    else {
+      var why = !montoOK?('el monto no coincide (esperado $'+PAY.price.toLocaleString('es-AR')+')') : (!destOK?'el destinatario no figura como vos' : (!v.es_hoy?'la fecha no es de hoy' : 'el comprobante no parece válido'));
+      note.textContent='No lo pude aprobar: '+why+'. Revisá y subilo de nuevo.'; note.style.color='var(--app-accent)';
+    }
+  }).catch(function(){note.textContent='Sin conexión para verificar. Probá de nuevo.';note.style.color='var(--app-accent)';});
+}
+function publishNow(){
+  var pn=(document.getElementById('pname')&&document.getElementById('pname').value)||spec.name||'Mi web';
+  var code=LZString.compressToEncodedURIComponent(JSON.stringify({s:spec,t:tw,n:pn}));
+  var note=document.getElementById('pubNote');
+  if((location.origin+location.pathname+'#site='+code).length>16000){note.textContent='Tu web tiene fotos muy pesadas para publicar por link. Publicá con menos fotos.';note.style.color='var(--app-accent)';return;}
+  var url=location.origin+location.pathname+'#site='+code;
+  note.style.color='var(--ok)';
+  note.innerHTML='✓ ¡Pago verificado y web publicada! Tu link:<br><a href="'+url+'" target="_blank" rel="noopener" style="color:var(--app-accent);word-break:break-all">'+url+'</a> <button class="bg2" style="padding:3px 9px;font-size:12px" onclick="(function(b){try{navigator.clipboard.writeText(b.previousElementSibling.href)}catch(e){};b.textContent=\'copiado\'})(this)">copiar</button>';
+}
+(function(){var ps=document.getElementById('pubScrim');if(ps){ps.addEventListener('click',function(e){if(e.target.id==='pubScrim')pubClose();});}document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ps&&ps.classList.contains('on'))pubClose();});})();
+
+/* Retorno desde MercadoPago: verifica el pago y publica */
+function _maybePaidReturn(){
+  var p; try{p=new URLSearchParams(location.search);}catch(e){return false;}
+  var ref=p.get('paid'); if(!ref)return false;
+  var pid=p.get('payment_id')||p.get('collection_id')||'';
+  var rec=null; try{rec=JSON.parse(localStorage.getItem('vpub_'+ref)||'null');}catch(e){}
+  var css='<style>html,body{margin:0;min-height:100%;background:#0e0e11;color:#f1f0ee;font-family:Inter,system-ui,sans-serif}'
+    +'#pr{max-width:520px;margin:0 auto;padding:60px 24px;text-align:center}#pr .ic{font-size:46px}'
+    +'#pr h1{font-size:24px;margin:14px 0 6px;font-weight:800}#pr p{color:#9b9aa1;font-size:15px;line-height:1.5}'
+    +'#pr .lk{display:flex;gap:8px;margin:20px 0;background:#171719;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px}'
+    +'#pr .lk input{flex:1;background:transparent;border:0;color:#f1f0ee;font-size:13px;outline:none}'
+    +'#pr a.btn,#pr button.btn{display:inline-block;background:#ff5a36;color:#fff;font-weight:700;font-size:15px;padding:12px 18px;border:0;border-radius:999px;text-decoration:none;cursor:pointer;margin:4px}'
+    +'#pr button.cp{background:#202024;color:#f1f0ee;border:1px solid rgba(255,255,255,.14)}</style>';
+  document.head.insertAdjacentHTML('beforeend',css);
+  document.body.innerHTML='<div id="pr"><div class="ic">⏳</div><h1>Verificando tu pago…</h1><p>Un segundito.</p></div>';
+  var box=document.getElementById('pr');
+  function fail(msg){box.innerHTML='<div class="ic">⚠️</div><h1>No pudimos confirmar el pago</h1><p>'+msg+'</p><p><a class="btn" href="'+location.pathname+'?run=1">Volver a Vendly</a></p>';}
+  if(!pid){fail('No recibimos el identificador del pago.');return true;}
+  fetch('/api/confirm?payment_id='+encodeURIComponent(pid)).then(function(r){return r.json();}).then(function(d){
+    if(d&&d.approved&&rec&&rec.code){
+      var url=location.origin+location.pathname+'#site='+rec.code;
+      box.innerHTML='<div class="ic">🎉</div><h1>¡Tu web está publicada!</h1><p>Ya está online. Este es tu link — guardalo y compartilo.</p>'
+        +'<div class="lk"><input id="pubURL" readonly value="'+url+'"><button class="btn cp" onclick="var i=document.getElementById(\'pubURL\');i.select();try{navigator.clipboard.writeText(i.value)}catch(e){document.execCommand(\'copy\')}this.textContent=\'Copiado ✓\'">Copiar</button></div>'
+        +'<p><a class="btn" href="'+url+'" target="_blank" rel="noopener">Abrir mi web →</a></p>';
+      try{localStorage.removeItem('vpub_'+ref);}catch(e){}
+    } else if(d&&d.status==='pending'){
+      box.innerHTML='<div class="ic">⌛</div><h1>Pago en proceso</h1><p>Cuando se acredite, tu web se publica.</p><p><a class="btn" href="'+location.pathname+'?run=1">Volver a Vendly</a></p>';
+    } else if(!rec){ fail('No encontramos los datos de tu web en este dispositivo. Escribinos y lo resolvemos.'); }
+    else { fail('El pago no figura aprobado todavía.'); }
+  }).catch(function(){fail('Error verificando el pago. Probá recargar.');});
+  return true;
+}
 function wait(ms){return new Promise(r=>setTimeout(r,ms))}
 
 /* keyboard */
@@ -895,8 +1019,10 @@ function syncTweaksUI(){
   document.getElementById('tw_r').value=tw.radius;rVal.textContent=tw.radius+'px';
 }
 /* ===== INITIAL ===== */
-if(_maybeDemoViewer()){
-  /* Modo visor: el dueño ve solo su web + barra Vendly. No carga el studio. */
+if(_maybePaidReturn()){
+  /* Volvió del pago: verificamos y publicamos. */
+}else if(_maybeDemoViewer()){
+  /* Modo visor: el dueño ve solo su web (demo con barra, o publicada con crédito). */
 }else{
   document.getElementById('researchTg').checked=research;
   if(restoreProject()){syncTweaksUI();showSite(renderSite(spec));}
