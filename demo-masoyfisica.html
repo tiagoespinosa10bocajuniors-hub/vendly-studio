@@ -1,0 +1,161 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Masoyfísica — Masajes, estética y bienestar en Berazategui</title>
+<meta name="description" content="Masoyfísica, centro de masajes, estética y bienestar en Berazategui. Masajes descontracturantes, manicura, pestañas, cejas, limpieza facial y más. Turnos por WhatsApp.">
+<meta property="og:title" content="Masoyfísica · Berazategui">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f3ec;--panel:#fffdf8;--ink:#33302a;--mut:#807a6e;--line:#e6e0d3;--accent:#6f8268;--accent-dk:#52624c;--fh:'Fraunces',serif;--fb:'Jost',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--ink);line-height:1.65;font-weight:300;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}::selection{background:var(--accent);color:#fff}
+.wrap{max-width:1120px;margin:0 auto;padding:0 26px}
+h1,h2,h3{font-family:var(--fh);font-weight:500;letter-spacing:-.01em;line-height:1.1}
+.kick{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.btn{display:inline-flex;align-items:center;gap:9px;background:var(--accent);color:#fff;font-weight:500;font-size:15px;padding:14px 26px;border-radius:999px;transition:transform .2s,background .2s}
+.btn:hover{transform:translateY(-2px);background:var(--accent-dk)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+nav{position:sticky;top:0;z-index:20;background:rgba(246,243,236,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:66px}
+.logo{font-family:var(--fh);font-weight:600;font-size:21px;letter-spacing:-.01em}
+.logo b{color:var(--accent)}
+nav .lk{display:flex;gap:26px;font-size:14px;color:var(--mut)}
+nav .lk a:hover{color:var(--ink)}
+@media(max-width:780px){nav .lk{display:none}}
+.hero{position:relative;padding:92px 0 80px;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;z-index:0}
+.blob.a{width:460px;height:460px;background:#aebfa1;top:-140px;right:-100px}
+.blob.b{width:360px;height:360px;background:#e8d9c4;bottom:-160px;left:-120px}
+.hero .wrap{position:relative;z-index:1}
+.hero h1{font-size:clamp(42px,8vw,86px);max-width:14ch}
+.hero p.sub{margin:22px 0 6px;font-size:clamp(17px,2.3vw,20px);color:var(--mut);max-width:50ch}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.stats{background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stats .wrap{display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{padding:28px 16px;text-align:center;border-left:1px solid var(--line)}
+.stat:first-child{border-left:0}
+.stat b{display:block;font-family:var(--fh);font-size:clamp(18px,2.6vw,24px);font-weight:500;color:var(--ink)}
+.stat span{font-size:13px;color:var(--mut)}
+@media(max-width:760px){.stats .wrap{grid-template-columns:repeat(2,1fr)}.stat{border-top:1px solid var(--line)}.stat:nth-child(odd){border-left:0}}
+section.pad{padding:84px 0}
+.lead{font-size:clamp(28px,4.4vw,44px);font-family:var(--fh);font-weight:500;max-width:18ch;line-height:1.1}
+.eyebrow{margin-bottom:14px}
+.about{display:grid;grid-template-columns:1.1fr .9fr;gap:50px;align-items:center}
+@media(max-width:860px){.about{grid-template-columns:1fr;gap:28px}}
+.about p{color:var(--mut);font-size:17px;margin-top:18px}
+.about .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px}
+.about .card .row{display:flex;justify-content:space-between;padding:13px 0;border-top:1px solid var(--line);font-size:15px}
+.about .card .row:first-child{border-top:0}
+.about .card .row span{color:var(--mut)}
+.svc{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:34px}
+@media(max-width:760px){.svc{grid-template-columns:1fr}}
+.s{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px;transition:transform .2s,box-shadow .2s}
+.s:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(111,130,104,.14)}
+.s .ic{font-size:26px;margin-bottom:12px}
+.s h3{font-size:20px;margin-bottom:8px;font-weight:600}
+.s p{color:var(--mut);font-size:14.5px}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:32px}
+@media(max-width:760px){.gal{grid-template-columns:repeat(2,1fr)}}
+.gi{aspect-ratio:1;border:1px dashed var(--line);border-radius:16px;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:13px;text-align:center;padding:14px;background:var(--panel)}
+.close{position:relative;text-align:center;padding:92px 0;overflow:hidden;border-top:1px solid var(--line)}
+.close h2{font-size:clamp(30px,5.5vw,52px);max-width:16ch;margin:0 auto 12px}
+.close p{color:var(--mut);max-width:44ch;margin:0 auto 26px;font-size:18px}
+footer{border-top:1px solid var(--line);padding:38px 0;color:var(--mut);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.wa{position:fixed;right:20px;bottom:20px;z-index:30;width:58px;height:58px;border-radius:50%;background:#25d366;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.wa svg{width:30px;height:30px;fill:#fff}
+.reveal{opacity:0;transform:translateY(24px)}
+@media(prefers-reduced-motion:no-preference){.reveal{animation:rv .9s ease both}}
+@keyframes rv{to{opacity:1;transform:none}}
+</style></head>
+<body>
+
+<nav><div class="wrap">
+  <div class="logo">Maso<b>y</b>física</div>
+  <div class="lk"><a href="#nosotros">El centro</a><a href="#svc">Servicios</a><a href="#gal">El lugar</a><a href="#turno">Turnos</a></div>
+  <a class="btn" style="padding:10px 18px;font-size:14px" href="https://wa.me/5491141981953?text=Hola!%20Quiero%20reservar%20un%20turno" target="_blank" rel="noopener">Reservar</a>
+</div></nav>
+
+<header class="hero">
+  <span class="blob a"></span><span class="blob b"></span>
+  <div class="wrap">
+    <div class="kick reveal">Masajes · estética · bienestar — Berazategui</div>
+    <h1 class="reveal" style="margin-top:16px">Tu momento de bienestar, cerca de casa.</h1>
+    <p class="sub reveal">Masajes, belleza y cuidado integral en un solo lugar. De lunes a sábado, con turno previo.</p>
+    <div class="cta reveal">
+      <a class="btn" href="https://wa.me/5491141981953?text=Hola!%20Quiero%20reservar%20un%20turno" target="_blank" rel="noopener">Reservá tu turno →</a>
+      <a class="btn ghost" href="#svc">Ver servicios</a>
+    </div>
+  </div>
+</header>
+
+<div class="stats"><div class="wrap">
+  <div class="stat"><b>Lun a Sáb</b><span>de 8 a 21 hs</span></div>
+  <div class="stat"><b>Calle 141 esq. 18</b><span>Berazategui</span></div>
+  <div class="stat"><b>Con turno</b><span>reservás por WhatsApp</span></div>
+  <div class="stat"><b>Todo en uno</b><span>masajes + estética</span></div>
+</div></div>
+
+<section class="pad" id="nosotros"><div class="wrap about">
+  <div>
+    <div class="kick eyebrow">El centro</div>
+    <div class="lead">Tu bienestar, de la cabeza a los pies.</div>
+    <p>En Masoyfísica combinamos masajes, kinesiología y estética para que salgas renovado. Un espacio tranquilo en Berazategui donde cuidamos cada detalle de tu descanso y tu imagen.</p>
+    <p>Atendemos de lunes a sábado, de 8 a 21hs, siempre con turno previo para dedicarte el tiempo que merecés.</p>
+  </div>
+  <div class="card">
+    <div class="row"><span>Rubro</span><b>Masajes · estética · bienestar</b></div>
+    <div class="row"><span>Días</span><b>Lunes a sábado</b></div>
+    <div class="row"><span>Horario</span><b>08:00 — 21:00</b></div>
+    <div class="row"><span>Dirección</span><b>Calle 141 esq. 18, Berazategui</b></div>
+    <div class="row"><span>Reservas</span><b>WhatsApp (turno previo)</b></div>
+  </div>
+</div></section>
+
+<section class="pad" id="svc" style="padding-top:0"><div class="wrap">
+  <div class="kick eyebrow">Servicios</div>
+  <div class="lead">Todo lo que necesitás, en un solo lugar.</div>
+  <div class="svc">
+    <div class="s reveal"><div class="ic">💆</div><h3>Masajes</h3><p>Descontracturantes y relajantes, para soltar tensiones.</p></div>
+    <div class="s reveal"><div class="ic">💅</div><h3>Manos y pies</h3><p>Manicura, belleza de manos y podología.</p></div>
+    <div class="s reveal"><div class="ic">👁️</div><h3>Pestañas y cejas</h3><p>Lifting de pestañas y diseño de cejas.</p></div>
+    <div class="s reveal"><div class="ic">✨</div><h3>Facial</h3><p>Limpieza facial para una piel renovada.</p></div>
+    <div class="s reveal"><div class="ic">💇</div><h3>Capilar y barbería</h3><p>Tratamientos capilares y servicio de barbería.</p></div>
+    <div class="s reveal"><div class="ic">🌿</div><h3>Bienestar integral</h3><p>Un combo de cuidado para vos, en una sola visita.</p></div>
+  </div>
+</div></section>
+
+<section class="pad" id="gal" style="padding-top:0"><div class="wrap">
+  <div class="kick eyebrow">El lugar</div>
+  <div class="lead">Un espacio pensado para relajarte.</div>
+  <div class="gal">
+    <div class="gi">📸 Acá van fotos reales del centro<br>(mandame 6)</div>
+    <div class="gi">📸 Foto de la sala / un servicio</div>
+    <div class="gi">📸 Foto del lugar</div>
+    <div class="gi">📸 Foto del lugar</div>
+    <div class="gi">📸 Foto del lugar</div>
+    <div class="gi">📸 Foto del lugar</div>
+  </div>
+</div></section>
+
+<section class="close" id="turno">
+  <span class="blob a" style="opacity:.4"></span>
+  <div class="wrap" style="position:relative;z-index:1">
+    <div class="kick eyebrow" style="text-align:center">Turnos</div>
+    <h2>Date un momento. Reservá tu turno.</h2>
+    <p>Escribinos por WhatsApp y coordinamos día y horario. Lunes a sábado, de 8 a 21hs.</p>
+    <a class="btn" href="https://wa.me/5491141981953?text=Hola!%20Quiero%20reservar%20un%20turno" target="_blank" rel="noopener">Reservar por WhatsApp →</a>
+  </div>
+</section>
+
+<footer><div class="wrap">
+  <div>© Masoyfísica · Calle 141 esq. 18, Berazategui</div>
+  <div>WhatsApp 11 4198 1953 · Lun a Sáb 8–21hs</div>
+</div></footer>
+
+<a class="wa" href="https://wa.me/5491141981953?text=Hola!%20Quiero%20reservar%20un%20turno" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M.06 24l1.69-6.16a11.87 11.87 0 01-1.59-5.95C.16 5.34 5.5 0 12.06 0a11.82 11.82 0 018.41 3.49 11.82 11.82 0 013.49 8.41c0 6.56-5.34 11.9-11.9 11.9a11.9 11.9 0 01-5.69-1.45L.06 24zm6.6-3.81c1.68 1 3.28 1.6 5.4 1.6 5.45 0 9.89-4.43 9.89-9.88a9.85 9.85 0 00-2.9-7A9.81 9.81 0 0012.07 2c-5.46 0-9.9 4.43-9.9 9.88 0 2.23.65 3.9 1.75 5.65l-1 3.65 3.74-.99zm11.4-5.55c-.07-.12-.27-.2-.57-.35-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.76-1.66-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.06 2.88 1.21 3.08.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41z"/></svg>
+</a>
+</body></html>
